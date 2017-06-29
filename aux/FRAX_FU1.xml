@@ -1,0 +1,270 @@
+<org.obiba.magma.views.View>
+  <name>FRAX_FU1</name>
+  <from class="org.obiba.magma.views.JoinTable">
+    <list>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-inhome-f1.InHome_1</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-cache.BaselineDCS</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-images-f1.DualHipBoneDensity</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>CLSA-DCS.StandingHeight</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>CLSA-DCS.Weight</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>ncc_dexa.BL_CLEAN</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-sac-releases.InHome_Id</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-f1.ContraIndications</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-f1.DiseaseSymptoms</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-f1.Participants</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-f1.StandingHeight</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-f1.Weight</reference>
+      </table>
+    </list>
+  </from>
+  <select class="org.obiba.magma.views.support.NoneClause"/>
+  <where class="org.obiba.magma.views.support.AllClause"/>
+  <variables class="org.obiba.magma.js.views.VariablesClause">
+    <variables class="linked-hash-set">
+      <variable name="Age" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="13">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/Age</attribute>
+          <attribute name="script" valueType="text">var res=null;
+var dob = $(&apos;ncc_dexa.BL_CLEAN:DOBclean&apos;);
+var visit = $(&apos;clsa-dcs-f1.Participants:Admin.Interview.startDate&apos;).type(&apos;date&apos;);
+if(dob.isNull().not().and(visit.isNull().not()).value()) {
+    // turns a date into text and build a js date from the resulting string
+    var d1 = new Date(dob.type(&apos;text&apos;).value());
+    var d2 = new Date(visit.type(&apos;text&apos;).value());
+    res = Number((d2-d1)/(1000*60*60*24*365.25)).toFixed(2);
+} 
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMI" valueType="decimal" entityType="Participant" unit="cm" mimeType="" referencedEntityType="" index="11">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/BMI</attribute>
+          <attribute name="script" valueType="text">var res=null
+var height=$(&apos;clsa-dcs-f1.StandingHeight:RES_HEIGHT&apos;)
+var weight=$(&apos;clsa-dcs-f1.Weight:RES_WEIGHT&apos;)
+if(weight.isNull().not().and(height.isNull().not().and(height.gt(0))).value()) {
+  res = Number(10000*weight.div(height.multiply(height))).toFixed(2)  
+}  
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="ParentFx" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="606">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/ParentFx</attribute>
+          <attribute name="script" valueType="text">$(&apos;clsa-dcs-f1.DiseaseSymptoms:OST_MOM_COF1&apos;).any(&apos;YES&apos;)
+  .or($(&apos;clsa-dcs-f1.DiseaseSymptoms:OST_DAD_COF1&apos;).any(&apos;YES&apos;)).value()?1:0</attribute>
+        </attributes>
+      </variable>
+      <variable name="Alcohol" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="212">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/Alcohol</attribute>
+          <attribute name="script" valueType="text">var res=0
+if($(&apos;clsa-inhome-f1.InHome_1:ALC_EVER_COF1&apos;).any(&apos;YES&apos;).value()) {
+  
+  var a1=$(&apos;clsa-inhome-f1.InHome_1:ALC_RDWK_NB_COF1&apos;);
+  var a2=$(&apos;clsa-inhome-f1.InHome_1:ALC_WHWK_NB_COF1&apos;);
+  var a3=$(&apos;clsa-inhome-f1.InHome_1:ALC_BRWK_NB_COF1&apos;);
+  var a4=$(&apos;clsa-inhome-f1.InHome_1:ALC_OTWK_NB_COF1&apos;);
+  var a5=$(&apos;clsa-inhome-f1.InHome_1:ALC_LQRWK_NB_COF1&apos;);
+  
+  var nwk=newValue(0,&apos;decimal&apos;);
+  if(a1.isNull().not().value()) {    
+    nwk=nwk.plus(a1);
+  }   
+  if(a2.isNull().not().value()) {    
+    nwk=nwk.plus(a2);
+  }    
+  if(a3.isNull().not().value()) {    
+    nwk=nwk.plus(a3);
+  }    
+  if(a4.isNull().not().value()) {    
+    nwk=nwk.plus(a4);
+  }    
+  if(a5.isNull().not().value()) {    
+    nwk=nwk.plus(a5);
+  }  
+
+  a1=$(&apos;clsa-inhome-f1.InHome_1:ALC_WERD_NB_COF1&apos;);
+  a2=$(&apos;clsa-inhome-f1.InHome_1:ALC_WEWH_NB_COF1&apos;);
+  a3=$(&apos;clsa-inhome-f1.InHome_1:ALC_WEBR_NB_COF1&apos;);
+  a4=$(&apos;clsa-inhome-f1.InHome_1:ALC_WEOT_NB_COF1&apos;);
+  a5=$(&apos;clsa-inhome-f1.InHome_1:ALC_WELQR_NB_COF1&apos;);
+  
+  var nwe=newValue(0,&apos;decimal&apos;);
+  if(a1.isNull().not().value()) {    
+    nwe=nwe.plus(a1);
+  }
+  if(a2.isNull().not().value()) {    
+    nwe=nwe.plus(a2);
+  }
+  if(a3.isNull().not().value()) {    
+    nwe=nwe.plus(a3);
+  }
+  if(a4.isNull().not().value()) {
+    nwe=nwe.plus(a4);
+  }
+  if(a5.isNull().not().value()) {
+    nwe=nwe.plus(a5);
+  }
+  
+  //res=nwe.plus(nwk).value()
+  res=(nwe.plus(nwk).value()/7.0 &gt;= 3.0)?1:0  
+}  
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="TScore" valueType="decimal" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="12">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/TScore</attribute>
+          <attribute name="script" valueType="text">var res=null;
+var bmd=newValue(null,&apos;decimal&apos;);
+var hasLt=$(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;LEFT&apos;).value();
+var hasRt=$(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;RIGHT&apos;).value();
+if(hasLt) {
+  bmd=$group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;LEFT&apos;,&apos;Measure.RES_HIP_NECK_BMD&apos;).asSequence().last();
+} else if(hasRt) {
+  bmd=$group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;RIGHT&apos;,&apos;Measure.RES_HIP_NECK_BMD&apos;).asSequence().last();
+}
+if(bmd.isNull().not().value()) {  
+  var M_value=0.849;
+  var L_value=1.0;
+  var sigma=0.111;
+  res = Number((bmd.value()/M_value - 1.0)*M_value/sigma).toFixed(1);
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="Sex" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="5">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/Sex</attribute>
+          <attribute name="script" valueType="text">$(&apos;clsa-sac-releases.InHome_Id:SEX_ASK_COM&apos;).map({&apos;F&apos;:&apos;1&apos;,&apos;M&apos;:&apos;0&apos;},null)</attribute>
+        </attributes>
+      </variable>
+      <variable name="Smoker" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="127">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/Smoker</attribute>
+          <attribute name="script" valueType="text">$(&apos;clsa-dcs-f1.ContraIndications:ICQ_SMOKE_COF1&apos;).any(&apos;YES&apos;).value()?1:0</attribute>
+        </attributes>
+      </variable>
+      <variable name="PreviousFx" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="594">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/PreviousFx</attribute>
+          <attribute name="script" valueType="text">$(&apos;clsa-dcs-f1.DiseaseSymptoms:OST_BONE_COF1&apos;).any(&apos;YES&apos;)
+  .and($(&apos;clsa-dcs-f1.DiseaseSymptoms:OST_FRAC_HIP_COF1&apos;)
+    .or($(&apos;clsa-dcs-f1.DiseaseSymptoms:OST_FRAC_SPIN_COF1&apos;))
+    .or($(&apos;clsa-dcs-f1.DiseaseSymptoms:OST_FRAC_WRST_COF1&apos;))).value()?1:0</attribute>
+        </attributes>
+      </variable>
+      <variable name="ArthritisR" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="538">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/ArthritisR</attribute>
+          <attribute name="script" valueType="text">$(&apos;clsa-dcs-f1.DiseaseSymptoms:CCC_RA_COF1&apos;).any(&apos;YES&apos;).value()?1:0</attribute>
+        </attributes>
+      </variable>
+      <variable name="Gluco" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="613">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/Glucco</attribute>
+          <attribute name="script" valueType="text">$(&apos;clsa-dcs-f1.DiseaseSymptoms:OST_CST_COF1&apos;).any(&apos;YES&apos;).value()?1:0</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMI_BL" valueType="decimal" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/BMI_BL</attribute>
+          <attribute name="script" valueType="text">var bmi_bl=$(&apos;ncc_dexa.FRAX_BL:BMI&apos;)
+var hbl = $(&apos;CLSA-DCS.StandingHeight:Measure.RES_HEIGHT_MEASURE&apos;).asSequence()
+if(bmi_bl.isNull().value()) {
+  var h =  $(&apos;ncc_dexa.BL_CLEAN:HEIGHTclean&apos;)
+  var w =  $(&apos;ncc_dexa.BL_CLEAN:WEIGHTclean&apos;)
+  if(h.isNull().value()) {
+    var hbl = $(&apos;CLSA-DCS.StandingHeight:Measure.RES_HEIGHT_MEASURE&apos;).asSequence()
+    var hfu = $(&apos;clsa-dcs-f1.StandingHeight:RES_HEIGHT&apos;)
+    if(hfu.isNull().not().and(hbl.size().gt(1)).value()) {
+      var min = newValue(100000,&apos;decimal&apos;)      
+      for(var i=0;i&lt;hbl.size();i++) {
+        var hi = hbl.valueAt(i).minus(hfu).abs()
+        if(hi.lt(min)) {
+          min = hi
+          h = hbl.valueAt(i)          
+        }        
+      }      
+    }
+  } else {
+    h=h.multiply(100)
+  }
+  if(w.isNull().value()) {
+    var wbl = $(&apos;CLSA-DCS.Weight:Measure.RES_WEIGHT_MEASURE&apos;).asSequence()
+    var wfu = $(&apos;clsa-dcs-f1.Weight:RES_WEIGHT&apos;)
+    if(wfu.isNull().not().and(wbl.size().gt(1)).value()) {
+      var min = newValue(100000,&apos;decimal&apos;)      
+      for(var i=0;i&lt;wbl.size();i++) {
+        var wi = wbl.valueAt(i).minus(wfu).abs()
+        if(wi.lt(min)) {
+          min = wi
+          w = wbl.valueAt(i)          
+        }        
+      }      
+    }
+  }
+  if(w.isNull().not().and(h.isNull().not().and(h.gt(0))).value()) {
+    bmi_bl = Number(10000*w.div(h.multiply(h))).toFixed(2)  
+  }
+} 
+bmi_bl</attribute>
+        </attributes>
+      </variable>
+      <variable name="Side" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/Side</attribute>
+          <attribute name="script" valueType="text">var res=null
+if($(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;LEFT&apos;)
+  .and($group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;LEFT&apos;,&apos;Measure.RES_HIP_NECK_BMD&apos;)
+  .asSequence().last().isNull().not()).value()) {
+  res = &apos;L&apos;  
+} else if($(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;RIGHT&apos;)
+  .and($group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;RIGHT&apos;,&apos;Measure.RES_HIP_NECK_BMD&apos;)
+  .asSequence().last().isNull().not()).value()) {
+  res = &apos;R&apos;
+}
+res</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMD" valueType="decimal" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_FU1/variable/BMD</attribute>
+          <attribute name="script" valueType="text">var res=null
+if($(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;LEFT&apos;).value()) {
+  res=$group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;LEFT&apos;,&apos;Measure.RES_HIP_NECK_BMD&apos;).asSequence().last()
+} else if($(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;RIGHT&apos;).value()) {
+  res=$group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;RIGHT&apos;,&apos;Measure.RES_HIP_NECK_BMD&apos;).asSequence().last()
+}
+res</attribute>
+        </attributes>
+      </variable>
+    </variables>
+  </variables>
+  <created valueType="datetime">2016-12-07T12:52:31.253-05</created>
+  <updated valueType="datetime">2017-03-13T11:12:13.586-04</updated>
+</org.obiba.magma.views.View>

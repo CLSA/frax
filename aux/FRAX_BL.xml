@@ -1,0 +1,170 @@
+<org.obiba.magma.views.View>
+  <name>FRAX_BL</name>
+  <from class="org.obiba.magma.views.JoinTable">
+    <list>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-dcs-images.DualHipBoneDensity</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>ncc_dexa.BL_CLEAN</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-sac-releases.60minQv1_CoP_Baseline</reference>
+      </table>
+    </list>
+  </from>
+  <select class="org.obiba.magma.views.support.NoneClause"/>
+  <where class="org.obiba.magma.views.support.AllClause"/>
+  <variables class="org.obiba.magma.js.views.VariablesClause">
+    <variables class="linked-hash-set">
+      <variable name="Age" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="13">
+        <attributes>
+          <attribute name="script" valueType="text">var res=null;
+// YM: get data only once (for the if and for the processing)
+var dob = $(&apos;ncc_dexa.BL_CLEAN:DOBclean&apos;);
+var visit = $(&apos;ncc_dexa.BL_CLEAN:VISITDATEclean&apos;);
+if(dob.isNull().not().and(visit.isNull().not()).value()) {
+    // turns a date into text and build a js date from the resulting string
+    var d1 = new Date(dob.type(&apos;text&apos;).value());
+    var d2 = new Date(visit.type(&apos;text&apos;).value());
+    res = Number((d2-d1)/(1000*60*60*24*365.25)).toFixed(2);
+} 
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/Age</attribute>
+        </attributes>
+      </variable>
+      <variable name="BMI" valueType="text" entityType="Participant" unit="cm" mimeType="" referencedEntityType="" index="11">
+        <attributes>
+          <attribute name="script" valueType="text">var res=null
+var height=$(&apos;ncc_dexa.BL_CLEAN:HEIGHTclean&apos;);
+var weight=$(&apos;ncc_dexa.BL_CLEAN:WEIGHTclean&apos;);
+if(weight.isNull().not().and(height.isNull().not().and(height.gt(0))).value()) {
+  res = Number(weight.div(height.multiply(height))).toFixed(2)  
+}  
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/BMI</attribute>
+        </attributes>
+      </variable>
+      <variable name="ParentFx" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="606">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:OST_MOM_COM&apos;).any(&apos;1&apos;)
+  .or($(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:OST_DAD_COM&apos;).any(&apos;1&apos;)).value()?1:0</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/ParentFx</attribute>
+        </attributes>
+      </variable>
+      <variable name="Alcohol" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="212">
+        <attributes>
+          <attribute name="script" valueType="text">var res=0
+if($(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_EVER_COM&apos;).any(&apos;1&apos;).value()) {
+  
+  var a1=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_RDWD_NB_COM&apos;);    
+  var a2=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_WHWD_NB_COM&apos;);
+  var a3=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_BRWD_NB_COM&apos;);
+  var a4=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_OTWD_NB_COM&apos;);
+  var a5=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_LQWD_NB_COM&apos;);
+  
+  var nwk=newValue(0,&apos;decimal&apos;);
+  if(a1.type(&apos;integer&apos;).any(98,99,777).not().value()) {    
+    nwk=nwk.plus(a1);
+  }   
+  if(a2.type(&apos;integer&apos;).any(98,99,777).not().value()) {    
+    nwk=nwk.plus(a2);
+  }    
+  if(a3.type(&apos;integer&apos;).any(98,99,777).not().value()) {    
+    nwk=nwk.plus(a3);
+  }    
+  if(a4.type(&apos;integer&apos;).any(98,99,777).not().value()) {    
+    nwk=nwk.plus(a4);
+  }    
+  if(a5.type(&apos;integer&apos;).any(98,99,777).not().value()) {    
+    nwk=nwk.plus(a5);
+  }  
+
+  a1=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_RDWE_NB_COM&apos;);    
+  a2=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_WHWE_NB_COM&apos;);
+  a3=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_BRWE_NB_COM&apos;);
+  a4=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_OTWE_NB_COM&apos;);
+  a5=$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ALC_LQWE_NB_COM&apos;);
+  
+  var nwe=newValue(0,&apos;decimal&apos;);
+  if(a1.type(&apos;integer&apos;).any(98,99,777).not().value()) {    
+    nwe=nwe.plus(a1);
+  }
+  if(a2.type(&apos;integer&apos;).any(98,99,777).not().value()) {    
+    nwe=nwe.plus(a2);
+  }
+  if(a3.type(&apos;integer&apos;).any(98,99,777).not().value()) {    
+    nwe=nwe.plus(a3);
+  }
+  if(a4.type(&apos;integer&apos;).any(98,99,777).not().value()) {
+    nwe=nwe.plus(a4);
+  }
+  if(a5.type(&apos;integer&apos;).any(98,99,777).not().value()) {
+    nwe=nwe.plus(a5);
+  }
+    
+  res=(nwe.plus(nwk).value()/7.0 &gt;= 3.0)?1:0  
+}  
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/Alcohol</attribute>
+        </attributes>
+      </variable>
+      <variable name="TScore" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="12">
+        <attributes>
+          <attribute name="script" valueType="text">var res=null;
+var bmd=newValue(null,&apos;decimal&apos;);
+var hasLt=$(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;LEFT&apos;).value();
+var hasRt=$(&apos;Measure.OUTPUT_HIP_SIDE&apos;).any(&apos;RIGHT&apos;).value();
+if(hasLt) {
+  bmd=$group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;LEFT&apos;,&apos;Measure.RES_HIP_NECK_BMD&apos;).asSequence().last();
+} else if(hasRt) {
+  bmd=$group(&apos;Measure.OUTPUT_HIP_SIDE&apos;,&apos;RIGHT&apos;,&apos;Measure.RES_HIP_NECK_BMD&apos;).asSequence().last();
+}
+if(bmd.isNull().not().value()) {  
+  var M_value=0.849;
+  var L_value=1.0;
+  var sigma=0.111;
+  res = Number((bmd.value()/M_value - 1.0)*M_value/sigma).toFixed(1);
+}
+res</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/TScore</attribute>
+        </attributes>
+      </variable>
+      <variable name="Sex" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="5">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;clsa-sac-releases.InHome_Id:SEX_ASK_COM&apos;).map({&apos;F&apos;:&apos;1&apos;,&apos;M&apos;:&apos;0&apos;},null)</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/Sex</attribute>
+        </attributes>
+      </variable>
+      <variable name="Smoker" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="127">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:ICQ_SMOKE_COM&apos;).any(&apos;1&apos;).value()?1:0</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/Smoker</attribute>
+        </attributes>
+      </variable>
+      <variable name="PreviousFx" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="594">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:OST_BONE_COM&apos;).any(&apos;1&apos;)
+  .and( $(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:OST_FRAC_HIP_COM&apos;).any(&apos;1&apos;)
+    .or($(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:OST_FRAC_SPIN_COM&apos;).any(&apos;1&apos;))
+    .or($(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:OST_FRAC_WRST_COM&apos;).any(&apos;1&apos;)) ).value()?1:0</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/PreviousFx</attribute>
+        </attributes>
+      </variable>
+      <variable name="ArthritisR" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="538">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:CCC_RA_COM&apos;).any(&apos;1&apos;).value()?1:0</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/ArthritisR</attribute>
+        </attributes>
+      </variable>
+      <variable name="Gluco" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="613">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;clsa-sac-releases.60minQv1_CoP_Baseline:OST_CST_COM&apos;).any(&apos;1&apos;).value()?1:0</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/FRAX_BL/variable/Glucco</attribute>
+        </attributes>
+      </variable>
+    </variables>
+  </variables>
+  <created valueType="datetime">2016-12-07T10:49:58.168-05</created>
+  <updated valueType="datetime">2017-02-14T14:02:15.889-05</updated>
+</org.obiba.magma.views.View>

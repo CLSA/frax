@@ -1,0 +1,126 @@
+<org.obiba.magma.views.View>
+  <name>BL_CLEAN</name>
+  <from class="org.obiba.magma.views.JoinTable">
+    <list>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-sac-releases.60minQv1_CoP_Baseline</reference>
+      </table>
+      <table class="org.obiba.magma.support.ValueTableReference">
+        <reference>clsa-sac-releases.InHome_Id</reference>
+      </table>
+    </list>
+  </from>
+  <select class="org.obiba.magma.views.support.NoneClause"/>
+  <where class="org.obiba.magma.views.support.AllClause"/>
+  <variables class="org.obiba.magma.js.views.VariablesClause">
+    <variables class="linked-hash-set">
+      <variable name="DOBclean" valueType="date" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="0">
+        <attributes>
+          <attribute name="label" valueType="text"></attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/BL_CLEAN/variable/DOBclean</attribute>
+          <attribute name="script" valueType="text">// YM: use format only if you want to turn a date into text
+//$(&apos;AGE_DOB_AGE_COM&apos;).format(&apos;yyyy-MM-dd&apos;)
+
+$(&apos;AGE_DOB_AGE_COM&apos;)</attribute>
+          <attribute name="label" valueType="text" locale="en">Date of birth</attribute>
+        </attributes>
+      </variable>
+      <variable name="SEXclean" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="3">
+        <attributes>
+          <attribute name="script" valueType="text">$(&apos;SEX_ASK_COM&apos;).map({&apos;F&apos;:&apos;FEMALE&apos;,&apos;M&apos;:&apos;MALE&apos;},null)</attribute>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/BL_CLEAN/variable/SEXclean</attribute>
+          <attribute name="label" valueType="text" locale="en">Sex</attribute>
+        </attributes>
+        <categories>
+          <category name="MALE"/>
+          <category name="FEMALE"/>
+        </categories>
+      </variable>
+      <variable name="ETHNICITYclean" valueType="text" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="35">
+        <attributes>
+          <attribute name="label" valueType="text"></attribute>
+          <attribute name="script" valueType="text">var w=false;
+var b=false;
+var h=false;
+var o=false;
+
+if($(&apos;SDC_CULT_WH_COM&apos;).any(&apos;1&apos;)
+ .or($(&apos;SDC_CULT_AI_COM&apos;).any(&apos;1&apos;))
+ .or($(&apos;SDC_CULT_OT_COM&apos;).any(&apos;1&apos;))
+ .or($(&apos;SDC_CULT_DK_NA_COM&apos;).any(&apos;1&apos;))
+ .or($(&apos;SDC_CULT_IU_COM&apos;).any(&apos;1&apos;))
+ .or($(&apos;SDC_CULT_REFUSED_COM&apos;).any(&apos;1&apos;))
+ .or($(&apos;SDC_CULT_ME_COM&apos;).any(&apos;1&apos;))
+ .or($(&apos;SDC_CULT_OTSP_COM&apos;).isNull().not()).value()) {
+  w=true;
+}
+
+if($(&apos;SDC_CULT_ZH_COM&apos;).any(&apos;1&apos;)
+  .or($(&apos;SDC_CULT_SA_COM&apos;).any(&apos;1&apos;))
+  .or($(&apos;SDC_CULT_FP_COM&apos;).any(&apos;1&apos;))
+  .or($(&apos;SDC_CULT_SE_COM&apos;).any(&apos;1&apos;))
+  .or($(&apos;SDC_CULT_AR_COM&apos;).any(&apos;1&apos;))
+  .or($(&apos;SDC_CULT_WA_COM&apos;).any(&apos;1&apos;))
+  .or($(&apos;SDC_CULT_JA_COM&apos;).any(&apos;1&apos;))
+  .or($(&apos;SDC_CULT_KO_COM&apos;).any(&apos;1&apos;)).value()) {
+  o=true;
+}
+
+if($(&apos;SDC_CULT_LA_COM&apos;).any(&apos;1&apos;).value()) {
+  h=true;
+}
+
+if($(&apos;SDC_CULT_BL_COM&apos;).any(&apos;1&apos;).value()) {
+  b=true;
+}
+
+if(w) {
+  &apos;W&apos;;
+} else if(b &amp;&amp; !(w || h || o)) {
+  &apos;B&apos;;
+} else if(h &amp;&amp; !(w || b || o)) {
+  &apos;H&apos;;
+} else if(o &amp;&amp; !(w || b || h)) {
+  &apos;O&apos;;
+} else {
+  &apos;W&apos;;
+}</attribute>
+          <attribute name="label" valueType="text" locale="en">Participant&apos;s cultural background</attribute>
+        </attributes>
+        <categories>
+          <category name="W"/>
+          <category name="B"/>
+          <category name="H"/>
+          <category name="O"/>
+        </categories>
+      </variable>
+      <variable name="VISITDATEclean" valueType="date" entityType="Participant" unit="" mimeType="" referencedEntityType="" index="905">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/BL_CLEAN/variable/VISITDATEclean</attribute>
+          <attribute name="script" valueType="text">// YM: use format only if you want to turn a date into text
+//$(&apos;ADM_startDate_COM&apos;).format(&apos;yyyy-MM-dd&apos;)
+
+$(&apos;ADM_startDate_COM&apos;)</attribute>
+          <attribute name="label" valueType="text" locale="en">Date and time at start of data collection site visit</attribute>
+        </attributes>
+      </variable>
+      <variable name="HEIGHTclean" valueType="decimal" entityType="Participant" unit="cm" mimeType="" referencedEntityType="" index="1060">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/BL_CLEAN/variable/HEIGHTclean</attribute>
+          <attribute name="script" valueType="text">$(&apos;HGT_HEIGHT_M_COM&apos;)
+</attribute>
+          <attribute name="label" valueType="text" locale="en">Average height in m</attribute>
+        </attributes>
+      </variable>
+      <variable name="WEIGHTclean" valueType="decimal" entityType="Participant" unit="Kg" mimeType="" referencedEntityType="" index="1064">
+        <attributes>
+          <attribute name="derivedFrom" namespace="opal" valueType="text">/datasource/ncc_dexa/table/BL_CLEAN/variable/WEIGHTclean</attribute>
+          <attribute name="script" valueType="text">$(&apos;WGT_WEIGHT_KG_COM&apos;)</attribute>
+          <attribute name="label" valueType="text" locale="en">Average weight in kg</attribute>
+        </attributes>
+      </variable>
+    </variables>
+  </variables>
+  <created valueType="datetime">2017-01-11T12:43:48.310-05</created>
+  <updated valueType="datetime">2017-01-19T15:51:28.738-05</updated>
+</org.obiba.magma.views.View>
