@@ -9,8 +9,6 @@ if($argc != 3) {
 
 $verbose = false;
 $infileName = $argv[1];
-$outfileName = $argv[2];
-$participant_list = array();
 $file = fopen($infileName,'r');
 if(false === $file)
 {
@@ -18,9 +16,10 @@ if(false === $file)
   die();
 }
 
+$outfileName = $argv[2];
+$participant_list = array();
 $line = NULL;
 $line_count = 0;
-$nlerr = 0;
 $first = true;
 $header = NULL;
 util::out('reading csv data' );
@@ -33,20 +32,16 @@ while(false !== ($line = fgets($file)))
   {
     $header = $line;
     $first = false;
-    //var_dump($header);
     continue;
   }
 
-  if(count($header)!=count($line))
+  if(count($header) != count($line))
   {
-    util::out('Error: line (' . $line_count . ') wrong number of elements ' . util::flatten($line)  );
+    util::out('Error: line (' . $line_count . ') wrong number of elements ' . util::flatten($line));
     continue;
   }
   $line = array_combine($header,$line);
   $uid = $line['UID'];
-  //array_shift($line);
-
-
   if(preg_match('/^[A-Z]\d{6}$/',$uid))
   {
     $participant_list[$uid] = $line;
@@ -75,14 +70,14 @@ $frax_keys = array(
 'TScore');
 $header = $frax_keys;
 array_unshift($header,'UID','TYPE','COUNTRY_CODE');
-$header[]='P_OSTEOFX_NOBMD';
-$header[]='P_HIPFX_NOBMD';
-$header[]='P_OSTEOFX_BMD';
-$header[]='P_HIPFX_BMD';
-$header[]='OSTEOFX_CAT';
+$header[] = 'P_OSTEOFX_NOBMD';
+$header[] = 'P_HIPFX_NOBMD';
+$header[] = 'P_OSTEOFX_BMD';
+$header[] = 'P_HIPFX_BMD';
+$header[] = 'OSTEOFX_CAT';
 
-$frax_keys=array_combine($frax_keys,array_fill(0,count($frax_keys),'_'));
-$frax_keys['Osteo']=0;
+$frax_keys = array_combine($frax_keys, array_fill(0, count($frax_keys), '_'));
+$frax_keys['Osteo'] = 0;
 
 // we will only run this on sets with non-missing TScores and unknown secondary osteoporosis condition,
 // setting the Osteo key value to zero and not '_'
@@ -94,28 +89,26 @@ $frax_keys['Osteo']=0;
 // we will always ignore the first two probabilities
 
 $current = 0;
-foreach($participant_list as $uid=>$data)
+foreach($participant_list as $uid => $data)
 {
-  $file = fopen('input.txt','w');
+  $file = fopen('input.txt', 'w');
   if(false === $file)
   {
     util::out('input.txt file cannot be opened');
     die();
   }
-  $str = array('t','19');
-  foreach($frax_keys as $key=>$def)
+  $str = array('t', '19');
+  foreach($frax_keys as $key => $def)
   {
-    if(array_key_exists($key,$data))
-    {
+    if(array_key_exists($key, $data))
       $str[] = $data[$key];
-    }
     else
       $str[] = $def;
   }
-  $str = util::flatten($str,',');
+  $str = util::flatten($str, ',');
   if($verbose)
     util::out('UID: ' . $uid . ' input { ' . $str . ' }');
-  fwrite($file,$str . PHP_EOL);
+  fwrite($file, $str . PHP_EOL);
   fclose($file);
 
   exec('wine blackbox.exe');
@@ -128,12 +121,12 @@ foreach($participant_list as $uid=>$data)
     util::out('output.txt file cannot be opened');
     die();
   }
-  $outdata=array();
+  $outdata = array();
   while(false !== ($line = fgets($file)))
   {
     $line = trim($line, "\,\n\"\t");
-    $line = explode(',',$line);
-    foreach($line as $value) $outdata[]=$value;
+    $line = explode(',', $line);
+    foreach($line as $value) $outdata[] = $value;
   }
 
   fclose($file);
@@ -142,44 +135,44 @@ foreach($participant_list as $uid=>$data)
     util::out('ERROR: missing output data for ' . $uid . ' : ' . util::flatten($outdata));
     die();
   }
-  array_unshift($outdata,$uid);
+  array_unshift($outdata, $uid);
   // add in the 3 level risk category
   $osteofx_cat = 'NA';
   $outdata[] = $osteofx_cat;
-  $outdata = array_combine($header,$outdata);
+  $outdata = array_combine($header, $outdata);
 
   $osteofx = $outdata['P_OSTEOFX_BMD'];
   $tscore = $outdata['TScore'];
   if('_' != $osteofx)
   {
-    if($osteofx<10.)
-      $osteofx_cat='LOW';
-    else if($osteofx>20.)
-      $osteofx_cat='HIGH';
+    if(10.0 > $osteofx)
+      $osteofx_cat = 'LOW';
+    else if(20.0 < $osteofx)
+      $osteofx_cat = 'HIGH';
     else
-      $osteofx_cat='MODERATE';
-    if($tscore<=2.5 && $osteofx_cat=='LOW')
-      $osteofx_cat='MODERATE';
+      $osteofx_cat = 'MODERATE';
+    if(2.5 >= $tscore && 'LOW' == $osteofx_cat)
+      $osteofx_cat = 'MODERATE';
     $outdata['OSTEOFX_CAT'] = $osteofx_cat;
   }
 
   $participant_list[$uid] = $outdata;
   if(!$verbose)
-    util::show_status(++$current,$target);
+    util::show_status(++$current, $target);
 }
 
-$file = fopen($outfileName,'w');
+$file = fopen($outfileName, 'w');
 if(false === $file)
 {
   util::out('file ' . $outfileName . ' cannot be created');
   die();
 }
 
-$str = '"' . util::flatten($header,'","') . '"' . PHP_EOL;
+$str = '"' . util::flatten($header, '","') . '"' . PHP_EOL;
 fwrite($file, $str);
 foreach($participant_list as $uid => $data)
 {
-  $str = '"' . util::flatten(array_values($data),'","') . '"' . PHP_EOL;
+  $str = '"' . util::flatten(array_values($data), '","') . '"' . PHP_EOL;
   fwrite($file, $str);
 }
 
