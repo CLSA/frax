@@ -151,7 +151,7 @@ foreach($participant_list as $uid => $data)
       $osteofx_cat = 'HIGH';
     else
       $osteofx_cat = 'MODERATE';
-    if(2.5 >= $tscore && 'LOW' == $osteofx_cat)
+    if(-2.5 >= $tscore && 'LOW' == $osteofx_cat)
       $osteofx_cat = 'MODERATE';
     $outdata['OSTEOFX_CAT'] = $osteofx_cat;
   }
